@@ -1,5 +1,6 @@
 pragma solidity ^0.5.0;
 
+import './SafeMath.sol';
 
 contract CampaignFactory {
     Campaign[] public deployedCampaigns;
@@ -16,6 +17,7 @@ contract CampaignFactory {
 
 
 contract Campaign {
+    using SafeMath for uint256;
 
     enum State {
         Fundraising,
