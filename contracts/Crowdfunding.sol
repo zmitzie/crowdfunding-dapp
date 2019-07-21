@@ -37,12 +37,7 @@ contract Campaign {
     event contributionReceived(address contributor, uint amount, uint _balance);
 
     modifier currentState(State _state) {
-        require(state == _state);
-        _;
-    }
-
-    modifier isCreator() {
-        require(msg.sender == creator);
+        require(state == _state, "The campaign is in a different state than it should be to run this function");
         _;
     }
 
@@ -63,7 +58,7 @@ contract Campaign {
     }
 
     function contribute() external currentState(State.Fundraising) payable {
-        require(msg.sender != creator);
+        require(msg.sender != creator, "The creator of the campaign cannot contribute to it");
         contributions[msg.sender] = contributions[msg.sender].add(msg.value);
         balance = balance.add(msg.value);
         emit contributionReceived(msg.sender, msg.value, balance);
@@ -94,7 +89,7 @@ contract Campaign {
     }
 
     function getRefund() public currentState(State.Expired) returns (bool) {
-        require(contributions[msg.sender] > 0);
+        require(contributions[msg.sender] > 0, "No contributions found from this address");
 
         uint amountToRefund = contributions[msg.sender];
         contributions[msg.sender] = 0;
