@@ -18,6 +18,31 @@
         </div>
       </div>
 
+      <!-- Load campaigns -->
+      <div id="campaignsRow" class="row">
+      </div>
+    </div>
+
+    <div id="campaignTemplate" style="display: none;">
+      <div class="col-md-12">
+        <div class="panel panel-default panel-pet">
+          <div class="panel-heading">
+            <h3 class="panel-title">Campaign Title</h3>
+          </div>
+          <div class="panel-body">
+            <strong>Description</strong>: <span class="campaign-description"></span><br/>
+            <strong>Goal</strong>: <span class="campaign-goal"></span> ETH<br/>
+            <strong>Deadline</strong>: <span class="campaign-deadline"></span><br/>
+            <strong>Collected so far</strong>: <span class="campaign-balance"></span> ETH<br/>
+            <strong>Completed at</strong>: <span class="campaign-completedat"><i>~not completed yet~</i></span><br/><br/>
+            <strong>Status</strong>: <span class="campaign-state"><i></i></span><br/><br/>
+            <strong>Creator</strong>: <span class="campaign-creator">ETH Address</span><br/>
+            <button class="btn btn-default btn-adopt" type="button" data-id="0">Adopt</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/web3.min.js"></script>
