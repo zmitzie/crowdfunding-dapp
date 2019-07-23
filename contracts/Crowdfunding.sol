@@ -113,7 +113,8 @@ contract Campaign {
         uint256 _deadline,
         State _currentState,
         uint256 _balance,
-        uint256 _goal
+        uint256 _goal,
+        uint _completedAt
     ) {
         _creator = creator;
         _title = title;
@@ -122,5 +123,7 @@ contract Campaign {
         _currentState = state;
         _balance = balance;
         _goal = goal;
+        _completedAt = completedAt;
+
     }
 }

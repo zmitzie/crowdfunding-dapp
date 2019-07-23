@@ -49,12 +49,13 @@ App = {
         App.contracts.Campaign.at(deployedCampaigns[i]).then(function (instance) {
           campaignInstance = instance
           campaignInstance.getDetails.call().then(function (detailsOfCampaign) {
+            console.log(detailsOfCampaign)
             var campaignsRow = $('#campaignsRow');
             var campaignTemplate = $('#campaignTemplate');
             campaignTemplate.find('.campaign-creator').text(detailsOfCampaign[0]);
             campaignTemplate.find('.panel-title').text(detailsOfCampaign[1]);
             campaignTemplate.find('.campaign-description').text(detailsOfCampaign[2]);
-            campaignTemplate.find('.campaign-deadline').text(detailsOfCampaign[3]);
+            campaignTemplate.find('.campaign-deadline').text(new Date(parseInt(detailsOfCampaign[3])* 1000));
             if (detailsOfCampaign[4] == 0) {
               campaignTemplate.find('.campaign-state').text("Fundraising");
             } else if (detailsOfCampaign[4] == 1) {
@@ -64,6 +65,7 @@ App = {
             }
             campaignTemplate.find('.campaign-balance').text(web3.fromWei(detailsOfCampaign[5]));
             campaignTemplate.find('.campaign-goal').text(web3.fromWei(detailsOfCampaign[6]));
+            campaignTemplate.find('.campaign-completedat').text(new Date(parseInt(detailsOfCampaign[7])* 1000));
             campaignTemplate.find('.input-hidden').val(instance.address);
             campaignTemplate.find('.input').attr('data-id', instance.address);
             campaignTemplate.find('.btn-contribute').attr('data-id', instance.address);
