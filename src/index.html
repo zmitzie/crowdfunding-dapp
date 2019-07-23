@@ -1,56 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Crowdfunding dApp</title>
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-xs-12 col-sm-8 col-sm-push-2">
-          <h1 class="text-center">KickstarTakis</h1>
-          <hr/>
-          <br/>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crowdfunding dApp</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+    integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/web3.min.js"></script>
+  <script src="js/truffle-contract.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    $(function () {
+      $("#datepicker").datepicker({
+        onSelect: function (dateText, inst) {
+          $("#campaign-deadline").val(dateText);
+        }
+      })
+    });
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <h1 class="text-center">KickstarTakis</h1>
+      <hr />
+      <br />
+    </div>
+    <div class="row">
+      <div class="col-md-9">
+        <div id="campaignsRow">
+        </div>
+        <div id="campaignTemplate" style="display: none;">
+          <div class="col-md-12">
+            <div class="panel panel-default panel-campaigns">
+              <div class="panel-heading">
+                <strong class="panel-title">Campaign Title </strong>
+                <span class="label label-default"></span> <br>
+                <small><span class="campaign-address"></span></small>
+              </div>
+              <div class="panel-body">
+                <strong>Description</strong>: <span class="campaign-description"></span><br />
+                <strong>Goal</strong>: <span class="campaign-goal"></span> ETH<br />
+                <strong>Deadline</strong>: <span class="campaign-deadline"></span><br />
+                <strong>Collected so far</strong>: <span class="campaign-balance"></span> ETH<br />
+                <strong>Completed at</strong>: <span class="campaign-completedat"></span><br />
+                <strong>Creator</strong>: <span class="campaign-creator">ETH Address</span><br />
+
+                <div id="contribute-section"><br>
+                  <strong>Contribute to this Campaign: </strong>
+                  <input class="input-hidden" type="hidden">
+                  <input class="input" type="text" data-id="0" placeholder="Amount in ETH">
+                  <button class="btn btn-default btn-contribute" type="button" data-id="0">Donate</button>
+                </div> <br>
+                  <button id="btn-refund" class="btn btn-danger" type="button" data-id="0">Request a refund if you contributed to this campaign</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Load campaigns -->
-      <div id="campaignsRow" class="row">
-      </div>
-    </div>
-
-    <div id="campaignTemplate" style="display: none;">
-      <div class="col-md-12">
-        <div class="panel panel-default panel-pet">
-          <div class="panel-heading">
-            <h3 class="panel-title">Campaign Title</h3>
-          </div>
-          <div class="panel-body">
-            <strong>Description</strong>: <span class="campaign-description"></span><br/>
-            <strong>Goal</strong>: <span class="campaign-goal"></span> ETH<br/>
-            <strong>Deadline</strong>: <span class="campaign-deadline"></span><br/>
-            <strong>Collected so far</strong>: <span class="campaign-balance"></span> ETH<br/>
-            <strong>Completed at</strong>: <span class="campaign-completedat"><i>~not completed yet~</i></span><br/><br/>
-            <strong>Status</strong>: <span class="campaign-state"><i></i></span><br/><br/>
-            <strong>Creator</strong>: <span class="campaign-creator">ETH Address</span><br/>
-
-            <input class="input-hidden" type="hidden">
-            <input class="input" type="text" data-id="0" placeholder="Amount in ETH">
-            <button class="btn btn-default btn-contribute" type="button" data-id="0">Donate</button>
-          </div>
+      <div class="col-md-3">
+        <div id="create-campaign">
+          <p>Hi, <span id=userAddress></span></p> <hr>
+          <h4>Create your own campaign:</h3>
+            <div class="form-group">
+              <strong>Title</strong>
+              <input type="text" class="form-control" id="campaign-title" placeholder="Type title here..." required>
+            </div>
+            <div class="form-group">
+              <strong>Description</strong>
+              <input type="text" class="form-control" id="campaign-description" placeholder="Type description here..."
+                required>
+            </div>
+            <div class="form-group">
+              <strong>Goal Amount</strong>
+              <input type="text" class="form-control" id="campaign-goal" placeholder="(in ETH)" required>
+            </div>
+            <div class="form-group">
+              <strong>Deadline</strong>
+              <input type="text" class="form-control" placeholder="Choose deadline..." id="datepicker" required>
+            </div>
+            <div class="form-group">
+              <input type="hidden" id="campaign-deadline">
+              <button class="btn btn-primary btn-create form-control" type="button" data-id="0">Create</button>
+            </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/web3.min.js"></script>
-    <script src="js/truffle-contract.js"></script>
-    <script src="js/app.js"></script>
-    
-  </body>
+</body>
+
 </html>
