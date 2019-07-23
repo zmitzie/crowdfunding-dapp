@@ -19,21 +19,21 @@ App = {
 
   initContract: function () {
     $.when(
-    $.getJSON('CampaignFactory.json', function (data) {
-      var CampaignFactoryArtifact = data
-      App.contracts.CampaignFactory = TruffleContract(CampaignFactoryArtifact)
-      App.contracts.CampaignFactory.setProvider(App.web3Provider)
-    }),
-  
-    $.getJSON('Campaign.json', function(data) {
-      var CampaignArtifact = data;
-      App.contracts.Campaign = TruffleContract(CampaignArtifact);
-      App.contracts.Campaign.setProvider(App.web3Provider);
-    })
-    ).then(function() {
+      $.getJSON('CampaignFactory.json', function (data) {
+        var CampaignFactoryArtifact = data
+        App.contracts.CampaignFactory = TruffleContract(CampaignFactoryArtifact)
+        App.contracts.CampaignFactory.setProvider(App.web3Provider)
+      }),
+
+      $.getJSON('Campaign.json', function (data) {
+        var CampaignArtifact = data;
+        App.contracts.Campaign = TruffleContract(CampaignArtifact);
+        App.contracts.Campaign.setProvider(App.web3Provider);
+      })
+    ).then(function () {
       return App.loadCampaigns()
     });
-    
+
   },
 
   //getter for Campaigns
@@ -47,9 +47,8 @@ App = {
       //loop addresses obtained from CampaignFactory
       for (var i = 0; i < deployedCampaigns.length; i++) {
         App.contracts.Campaign.at(deployedCampaigns[i]).then(function (instance) {
-        campaignInstance = instance
-        return campaignInstance.getDetails.call()
-        }).then(function (detailsOfCampaign) {
+          campaignInstance = instance
+          campaignInstance.getDetails.call().then(function (detailsOfCampaign) {
             var campaignsRow = $('#campaignsRow');
             var campaignTemplate = $('#campaignTemplate');
             campaignTemplate.find('.campaign-creator').text(detailsOfCampaign[0]);
@@ -65,13 +64,42 @@ App = {
             }
             campaignTemplate.find('.campaign-balance').text(web3.fromWei(detailsOfCampaign[5]));
             campaignTemplate.find('.campaign-goal').text(web3.fromWei(detailsOfCampaign[6]));
+            campaignTemplate.find('.input-hidden').val(instance.address);
+            campaignTemplate.find('.input').attr('data-id', instance.address);
+            campaignTemplate.find('.btn-contribute').attr('data-id', instance.address);
             campaignsRow.append(campaignTemplate.html());
-      })
-    
-    }
     }).catch(function (err) {
       console.log(err.message)
     })
+    return App.bindEvents();
+
+  },
+
+  bindEvents: function () {
+    $(document).on('click', '.btn-contribute', App.processContribution);
+  },
+
+  processContribution: function (event) {
+    event.preventDefault();
+
+    var campaignId = $(event.target).data('id');
+    var amount = $('input[data-id="' + campaignId + '"]').val();
+    var campaignInstance
+    web3.eth.getAccounts(function (err, accounts) {
+      if (err) console.log(err)
+      var account = accounts[0]
+
+      App.contracts.Campaign.at(campaignId).then(function (instance) {
+        campaignInstance = instance
+        return campaignInstance.contribute({ from: account, value: web3.toWei(amount, 'ether') })
+      }).then(function (result) {
+        return App.loadCampaigns()
+      }).catch(function (err) {
+        alert(err.message)
+      })
+    })
+  }
+
 };
 
 $(function () {

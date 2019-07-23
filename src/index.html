@@ -37,7 +37,10 @@
             <strong>Completed at</strong>: <span class="campaign-completedat"><i>~not completed yet~</i></span><br/><br/>
             <strong>Status</strong>: <span class="campaign-state"><i></i></span><br/><br/>
             <strong>Creator</strong>: <span class="campaign-creator">ETH Address</span><br/>
-            <button class="btn btn-default btn-adopt" type="button" data-id="0">Adopt</button>
+
+            <input class="input-hidden" type="hidden">
+            <input class="input" type="text" data-id="0" placeholder="Amount in ETH">
+            <button class="btn btn-default btn-contribute" type="button" data-id="0">Donate</button>
           </div>
         </div>
       </div>
@@ -48,5 +51,6 @@
     <script src="js/web3.min.js"></script>
     <script src="js/truffle-contract.js"></script>
     <script src="js/app.js"></script>
+    
   </body>
 </html>
