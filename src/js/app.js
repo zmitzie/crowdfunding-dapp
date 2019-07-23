@@ -59,9 +59,7 @@ App = {
             campaignTemplate.find('.panel-title').text(detailsOfCampaign[1]);
             campaignTemplate.find('.campaign-description').text(detailsOfCampaign[2]);
             campaignTemplate.find('.campaign-deadline').text(new Date(parseInt(detailsOfCampaign[3])* 1000));
-            console.log (detailsOfCampaign[4].c[0] == 0)
             if (detailsOfCampaign[4].c[0] == 0) {
-              console.log("hi")
               campaignTemplate.find('.campaign-completedat').text("~not completed yet~");
               campaignTemplate.find('.label-default').text("Fundraising");
               campaignTemplate.find('#contribute-section').show()
@@ -73,6 +71,7 @@ App = {
               campaignTemplate.find('.label-default').text("Expired");
               campaignTemplate.find('#contribute-section').hide()
               campaignTemplate.find('#btn-refund').show()
+              campaignTemplate.find('#btn-refund').attr('data-id', instance.address);
             } else {
               campaignTemplate.find('.campaign-completedat').text(new Date(parseInt(detailsOfCampaign[7])* 1000));
               campaignTemplate.find('.label-default').text("Successful");
@@ -95,6 +94,7 @@ App = {
   bindEvents: function () {
     $(document).on('click', '.btn-contribute', App.processContribution);
     $(document).on('click', '.btn-create', App.createCampaign);
+    $(document).on('click', '#btn-refund', App.refundContributor);
   },
 
   processContribution: function (event) {
@@ -111,6 +111,28 @@ App = {
         campaignInstance = instance
         return campaignInstance.contribute({ from: account, value: web3.toWei(amount, 'ether') })
       }).then(function (result) {
+        location.reload();
+      }).catch(function (err) {
+        alert(err.message)
+      })
+    })
+  },
+
+  refundContributor: function (event) {
+    console.log(event)
+    event.preventDefault();
+
+    var campaignId = $(event.target).data('id');
+    var campaignInstance
+    web3.eth.getAccounts(function (err, accounts) {
+      if (err) console.log(err)
+      var account = accounts[0]
+
+      App.contracts.Campaign.at(campaignId).then(function (instance) {
+        campaignInstance = instance
+        return campaignInstance.getRefund({ from: account})
+      }).then(function (result) {
+        console.log(result)
         location.reload();
       }).catch(function (err) {
         alert(err.message)
