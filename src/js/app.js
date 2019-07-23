@@ -13,7 +13,11 @@ App = {
       App.web3Provider = new Web3.providers.HttpProvider('http://localhost:8545')
     }
     web3 = new Web3(App.web3Provider)
-
+    web3.eth.getAccounts(function (err, accounts) {
+      if (err) console.log(err)
+      var account = accounts[0]
+      $('#userAddress').text(account.substring(0, 20)+"...");
+    })
     return App.initContract();
   },
 
@@ -49,26 +53,37 @@ App = {
         App.contracts.Campaign.at(deployedCampaigns[i]).then(function (instance) {
           campaignInstance = instance
           campaignInstance.getDetails.call().then(function (detailsOfCampaign) {
-            console.log(detailsOfCampaign)
             var campaignsRow = $('#campaignsRow');
             var campaignTemplate = $('#campaignTemplate');
             campaignTemplate.find('.campaign-creator').text(detailsOfCampaign[0]);
             campaignTemplate.find('.panel-title').text(detailsOfCampaign[1]);
             campaignTemplate.find('.campaign-description').text(detailsOfCampaign[2]);
             campaignTemplate.find('.campaign-deadline').text(new Date(parseInt(detailsOfCampaign[3])* 1000));
-            if (detailsOfCampaign[4] == 0) {
-              campaignTemplate.find('.campaign-state').text("Fundraising");
-            } else if (detailsOfCampaign[4] == 1) {
-              campaignTemplate.find('.campaign-state').text("Expired");
+            console.log (detailsOfCampaign[4].c[0] == 0)
+            if (detailsOfCampaign[4].c[0] == 0) {
+              console.log("hi")
+              campaignTemplate.find('.campaign-completedat').text("~not completed yet~");
+              campaignTemplate.find('.label-default').text("Fundraising");
+              campaignTemplate.find('#contribute-section').show()
+              campaignTemplate.find('.input').attr('data-id', instance.address);
+              campaignTemplate.find('.btn-contribute').attr('data-id', instance.address);
+              campaignTemplate.find('#btn-refund').hide()
+            } else if (detailsOfCampaign[4].c[0] == 1) {
+              campaignTemplate.find('.campaign-completedat').text(new Date(parseInt(detailsOfCampaign[7])* 1000));
+              campaignTemplate.find('.label-default').text("Expired");
+              campaignTemplate.find('#contribute-section').hide()
+              campaignTemplate.find('#btn-refund').show()
             } else {
-              campaignTemplate.find('.campaign-state').text("Successful");
+              campaignTemplate.find('.campaign-completedat').text(new Date(parseInt(detailsOfCampaign[7])* 1000));
+              campaignTemplate.find('.label-default').text("Successful");
+              campaignTemplate.find('#contribute-section').hide()
+              campaignTemplate.find('#btn-refund').hide()
             }
             campaignTemplate.find('.campaign-balance').text(web3.fromWei(detailsOfCampaign[5]));
             campaignTemplate.find('.campaign-goal').text(web3.fromWei(detailsOfCampaign[6]));
-            campaignTemplate.find('.campaign-completedat').text(new Date(parseInt(detailsOfCampaign[7])* 1000));
+            campaignTemplate.find('.campaign-address').text(instance.address);
+
             campaignTemplate.find('.input-hidden').val(instance.address);
-            campaignTemplate.find('.input').attr('data-id', instance.address);
-            campaignTemplate.find('.btn-contribute').attr('data-id', instance.address);
             campaignsRow.append(campaignTemplate.html());
     }).catch(function (err) {
       console.log(err.message)
@@ -79,6 +94,7 @@ App = {
 
   bindEvents: function () {
     $(document).on('click', '.btn-contribute', App.processContribution);
+    $(document).on('click', '.btn-create', App.createCampaign);
   },
 
   processContribution: function (event) {
@@ -90,12 +106,39 @@ App = {
     web3.eth.getAccounts(function (err, accounts) {
       if (err) console.log(err)
       var account = accounts[0]
-
+      
       App.contracts.Campaign.at(campaignId).then(function (instance) {
         campaignInstance = instance
         return campaignInstance.contribute({ from: account, value: web3.toWei(amount, 'ether') })
       }).then(function (result) {
-        return App.loadCampaigns()
+        location.reload();
+      }).catch(function (err) {
+        alert(err.message)
+      })
+    })
+  },
+
+  createCampaign: function (event) {
+    event.preventDefault();
+
+    const title = $("#campaign-title").val();
+    const description = $("#campaign-description").val();
+    const goal = $("#campaign-goal").val();
+    const deadline = $("#campaign-deadline").val();
+
+    const epochDeadline = (new Date(deadline).getTime() / 1000);
+
+    var campaignFactoryInstance
+    web3.eth.getAccounts(function (err, accounts) {
+      if (err) console.log(err)
+      var account = accounts[0]
+
+      App.contracts.CampaignFactory.deployed().then(function (instance) {
+        campaignFactoryInstance = instance
+        return campaignFactoryInstance.createCampaign(epochDeadline, web3.toWei(goal, 'ether'), title, description, { from: account})
+      }).then(function (result) {
+        console.log(result);
+        location.reload();
       }).catch(function (err) {
         alert(err.message)
       })
