@@ -51,6 +51,8 @@ contract Campaign {
         string memory _title,
         string memory _description
     ) public {
+        require(_deadline > now, "The deadline should be set at a later date");
+        require(_goal > 0, "Goal amount should be higher than zero");
         creator = _creator;
         goal = _goal;
         deadline = _deadline;
