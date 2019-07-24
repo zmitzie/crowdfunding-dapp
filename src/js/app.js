@@ -84,6 +84,9 @@ App = {
 
             campaignTemplate.find('.input-hidden').val(instance.address);
             campaignsRow.append(campaignTemplate.html());
+          })
+        })
+      }
     }).catch(function (err) {
       console.log(err.message)
     })
@@ -111,8 +114,10 @@ App = {
         campaignInstance = instance
         return campaignInstance.contribute({ from: account, value: web3.toWei(amount, 'ether') })
       }).then(function (result) {
+        alert("The transaction hash is: \n " + result.tx);
         location.reload();
       }).catch(function (err) {
+        console.log(err.message)
         alert(err.message)
       })
     })
@@ -132,7 +137,7 @@ App = {
         campaignInstance = instance
         return campaignInstance.getRefund({ from: account})
       }).then(function (result) {
-        console.log(result)
+        alert("The transaction hash is: \n " + result.tx);
         location.reload();
       }).catch(function (err) {
         alert(err.message)
@@ -159,7 +164,7 @@ App = {
         campaignFactoryInstance = instance
         return campaignFactoryInstance.createCampaign(epochDeadline, web3.toWei(goal, 'ether'), title, description, { from: account})
       }).then(function (result) {
-        console.log(result);
+        alert("The transaction hash is: \n " + result.tx);
         location.reload();
       }).catch(function (err) {
         alert(err.message)
