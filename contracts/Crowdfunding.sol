@@ -2,20 +2,28 @@ pragma solidity ^0.5.0;
 
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
+/// @title A factory contract that creates campaigns
+/// @author Zacharias Mitzelos
+/// @notice CampaignFactory creates and holds the deployed addresses of campaigns
 contract CampaignFactory {
     Campaign[] public deployedCampaigns;
 
+    /// @notice Deploys a Campaign contract with the given params
     function createCampaign(uint deadline, uint goal, string memory title, string memory description) public {
         Campaign newCampaign = new Campaign(msg.sender, deadline, goal, title, description);
         deployedCampaigns.push(newCampaign);
     }
 
+    /// @notice Returns the addresses of deployed Campaigns
+    /// @return array of addresses for deployed Campaigns
     function getDeployedCampaigns() public view returns (Campaign[] memory) {
         return deployedCampaigns;
     }
 }
 
-
+/// @title The Campaign contract
+/// @author Zacharias Mitzelos
+/// @notice The campaign contract contains the functionality to manage a campaign
 contract Campaign {
     using SafeMath for uint256;
 
@@ -38,6 +46,7 @@ contract Campaign {
 
     event contributionReceived(address contributor, uint amount, uint _balance);
 
+    /// @notice Verifies that the current state is the one that is required for the specific function
     modifier currentState(State _state) {
         require(state == _state, "The campaign is in a different state than it should be to run this function");
         _;
@@ -61,6 +70,9 @@ contract Campaign {
         balance = 0;
     }
 
+    /// @notice Receives a contribution for an active Camaign
+    /// @dev Will verify that the state is Fundraising, log the contributor address and amount,
+    //  increase the campaign balance var, emit an event and check the campaign status
     function contribute() external currentState(State.Fundraising) payable {
         require(msg.sender != creator, "The creator of the campaign cannot contribute to it");
         contributions[msg.sender] = contributions[msg.sender].add(msg.value);
@@ -69,6 +81,8 @@ contract Campaign {
         checkCampaignStatus();
     }
 
+    /// @notice Will run afer every contribution
+    /// @dev Checks if the deadline passed based on the block timestamp
     function checkCampaignStatus() public {
         if (balance >= goal) {
             state = State.Successful;
@@ -79,6 +93,9 @@ contract Campaign {
         completedAt = now;
     }
 
+    /// @notice Pays out the balance to the creator of the campaign
+    /// @dev Set to internal, will be called from checkCampaignStatus()
+    /// @return true or false, if the transfer of the balance to the creator was successful
     function payOut() internal currentState(State.Successful) returns (bool) {
         uint256 amountRaised = balance;
         balance = 0;
@@ -92,6 +109,8 @@ contract Campaign {
         return false;
     }
 
+    /// @notice Can be called by any contributor if the state of the Campaign is set to Expired
+    /// @return true or false, if the refund succeeded
     function getRefund() public currentState(State.Expired) returns (bool) {
         require(contributions[msg.sender] > 0, "No contributions found from this address");
 
@@ -107,6 +126,7 @@ contract Campaign {
         return true;
     }
 
+    /// @notice Returns all the state variables of the contract
     function getDetails() public view returns
     (
         address payable _creator,
