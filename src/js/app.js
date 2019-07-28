@@ -22,6 +22,7 @@ App = {
   },
 
   initContract: function () {
+    //get artifacts for CampaignFactory and Campaign
     $.when(
       $.getJSON('CampaignFactory.json', function (data) {
         var CampaignFactoryArtifact = data
@@ -48,7 +49,7 @@ App = {
       campaignFactoryInstance = instance
       return campaignFactoryInstance.getDeployedCampaigns.call()
     }).then(function (deployedCampaigns) {
-      //loop addresses obtained from CampaignFactory
+      //loop addresses obtained from CampaignFactory and call getDetails()
       for (var i = 0; i < deployedCampaigns.length; i++) {
         App.contracts.Campaign.at(deployedCampaigns[i]).then(function (instance) {
           campaignInstance = instance
@@ -58,6 +59,7 @@ App = {
             campaignTemplate.find('.campaign-creator').text(detailsOfCampaign[0]);
             campaignTemplate.find('.panel-title').text(detailsOfCampaign[1]);
             campaignTemplate.find('.campaign-description').text(detailsOfCampaign[2]);
+            //convert unix time to human-understandable date
             campaignTemplate.find('.campaign-deadline').text(new Date(parseInt(detailsOfCampaign[3])* 1000));
             if (detailsOfCampaign[4].c[0] == 0) {
               campaignTemplate.find('.campaign-completedat').text("~not completed yet~");
@@ -124,9 +126,9 @@ App = {
   },
 
   refundContributor: function (event) {
-    console.log(event)
     event.preventDefault();
 
+    // get deployed campaign address which is the id of the specific element
     var campaignId = $(event.target).data('id');
     var campaignInstance
     web3.eth.getAccounts(function (err, accounts) {
@@ -148,11 +150,13 @@ App = {
   createCampaign: function (event) {
     event.preventDefault();
 
+    // get values with jQuery
     const title = $("#campaign-title").val();
     const description = $("#campaign-description").val();
     const goal = $("#campaign-goal").val();
     const deadline = $("#campaign-deadline").val();
 
+    //convert Date provided by user to unix time
     const epochDeadline = (new Date(deadline).getTime() / 1000);
 
     var campaignFactoryInstance
@@ -160,6 +164,7 @@ App = {
       if (err) console.log(err)
       var account = accounts[0]
 
+      //use the deployed CampaignFactory to create a campaign
       App.contracts.CampaignFactory.deployed().then(function (instance) {
         campaignFactoryInstance = instance
         return campaignFactoryInstance.createCampaign(epochDeadline, web3.toWei(goal, 'ether'), title, description, { from: account})
