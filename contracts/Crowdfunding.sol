@@ -7,9 +7,19 @@ import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 /// @notice CampaignFactory creates and holds the deployed addresses of campaigns
 contract CampaignFactory {
     Campaign[] public deployedCampaigns;
+    address public owner = msg.sender;
+    bool public stop = false;
+
+    modifier pauseDeployments { require(!stop); _; }
+
+    modifier onlyOwner { require(msg.sender == owner); _; }
+
+    function setEmergencyStop(bool _stop) public onlyOwner {
+        stop = _stop;
+    }
 
     /// @notice Deploys a Campaign contract with the given params
-    function createCampaign(uint deadline, uint goal, string memory title, string memory description) public {
+    function createCampaign(uint deadline, uint goal, string memory title, string memory description) public pauseDeployments {
         Campaign newCampaign = new Campaign(msg.sender, deadline, goal, title, description);
         deployedCampaigns.push(newCampaign);
     }
