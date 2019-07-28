@@ -1,0 +1,9 @@
+Deployed to the Rinkeby Testnet.
+   
+   Deploying 'CampaignFactory'
+   ---------------------------
+   > transaction hash:    0x444b1ae86632a7537eb4f04a7487b5d5a81738b3b516204ee5df6d26e61eb498
+   > contract address:    0x09b74F010A7979e5a3291F277EaC18A9e1381aF0
+   > block number:        4813743
+   > account:             0xf9a034532b994125493FbAfCd8D186AB81387c97
+   > total cost:          0.03789788 ETH
