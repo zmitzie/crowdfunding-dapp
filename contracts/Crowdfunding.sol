@@ -12,13 +12,14 @@ contract CampaignFactory {
 
     modifier pauseDeployments { require(!stop); _; }
 
+    /// @notice CampaignFactory creates and holds the deployed addresses of campaigns
     modifier onlyOwner { require(msg.sender == owner); _; }
 
     function setEmergencyStop(bool _stop) public onlyOwner {
         stop = _stop;
     }
 
-    /// @notice Deploys a Campaign contract with the given params
+    /// @notice Deploys a Campaign contract with the given params, if the circuit breaker mechanism is not active
     function createCampaign(uint deadline, uint goal, string memory title, string memory description) public pauseDeployments {
         Campaign newCampaign = new Campaign(msg.sender, deadline, goal, title, description);
         deployedCampaigns.push(newCampaign);
