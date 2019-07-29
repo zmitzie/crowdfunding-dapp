@@ -59,6 +59,7 @@ App = {
             campaignTemplate.find('.campaign-creator').text(detailsOfCampaign[0]);
             campaignTemplate.find('.panel-title').text(detailsOfCampaign[1]);
             campaignTemplate.find('.campaign-description').text(detailsOfCampaign[2]);
+            campaignTemplate.find('.campaign-balance').text(web3.fromWei(detailsOfCampaign[5]));
             //convert unix time to human-understandable date
             campaignTemplate.find('.campaign-deadline').text(new Date(parseInt(detailsOfCampaign[3])* 1000));
             if (detailsOfCampaign[4].c[0] == 0) {
@@ -79,8 +80,8 @@ App = {
               campaignTemplate.find('.label-default').text("Successful");
               campaignTemplate.find('#contribute-section').hide()
               campaignTemplate.find('#btn-refund').hide()
+              campaignTemplate.find('.campaign-balance').text(web3.fromWei(detailsOfCampaign[6]));
             }
-            campaignTemplate.find('.campaign-balance').text(web3.fromWei(detailsOfCampaign[5]));
             campaignTemplate.find('.campaign-goal').text(web3.fromWei(detailsOfCampaign[6]));
             campaignTemplate.find('.campaign-address').text(instance.address);
 
